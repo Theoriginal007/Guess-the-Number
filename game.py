@@ -1,13 +1,10 @@
 import tkinter as tk
 import random
-import time
-import winsound  # For sound effects
 
 # Create the main window
 window = tk.Tk()
 window.title("Guess the Number")
 window.geometry("600x600")
-window.configure(bg="#2C3E50")  # Dark blue background
 
 # Global variables
 target_number = 0
@@ -16,14 +13,45 @@ max_attempts = 0
 remaining_attempts = 0
 wins = 0
 losses = 0
-start_time = 0  # Timer for each game
-theme = "dark"
+theme = "default"
+themes = {
+    "Default": {"bg": "#2C3E50", "fg": "#ECF0F1", "button_bg": "#3498DB", "button_fg": "#ECF0F1", "entry_bg": "#34495E", "entry_fg": "#ECF0F1"},
+    "Light": {"bg": "#FFFFFF", "fg": "#2C3E50", "button_bg": "#3498DB", "button_fg": "#FFFFFF", "entry_bg": "#E0E0E0", "entry_fg": "#2C3E50"},
+    "Dark": {"bg": "#121212", "fg": "#F5F5F5", "button_bg": "#BB86FC", "button_fg": "#121212", "entry_bg": "#2C2C2C", "entry_fg": "#F5F5F5"},
+}
+
+# Function to apply the selected theme
+def apply_theme(selected_theme):
+    theme_data = themes[selected_theme]
+    window.config(bg=theme_data["bg"])
+    label.config(bg=theme_data["bg"], fg=theme_data["fg"])
+    entry.config(bg=theme_data["entry_bg"], fg=theme_data["entry_fg"])
+    check_button.config(bg=theme_data["button_bg"], fg=theme_data["button_fg"])
+    reset_button.config(bg=theme_data["button_bg"], fg=theme_data["button_fg"])
+    attempts_label.config(bg=theme_data["bg"], fg=theme_data["fg"])
+    result_label.config(bg=theme_data["bg"], fg=theme_data["fg"])
+    scoreboard_label.config(bg=theme_data["bg"], fg=theme_data["fg"])
+    leaderboard_label.config(bg=theme_data["bg"], fg=theme_data["fg"])
+
+# Function to open settings window
+def open_settings():
+    settings_window = tk.Toplevel(window)
+    settings_window.title("Settings")
+    settings_window.geometry("400x300")
+    settings_window.config(bg=themes[theme]["bg"])
+
+    tk.Label(settings_window, text="Select Theme:", font=("Arial", 14), bg=themes[theme]["bg"], fg=themes[theme]["fg"]).pack(pady=20)
+
+    # Theme selection dropdown
+    theme_var = tk.StringVar(value=theme)
+    theme_dropdown = tk.OptionMenu(settings_window, theme_var, *themes.keys(), command=apply_theme)
+    theme_dropdown.config(font=("Arial", 12), bg=themes[theme]["button_bg"], fg=themes[theme]["button_fg"], width=10)
+    theme_dropdown.pack(pady=10)
 
 # Function to start a new game
 def start_game(difficulty):
-    global target_number, attempts, max_attempts, remaining_attempts, start_time
+    global target_number, attempts, max_attempts, remaining_attempts
     attempts = 0
-    start_time = time.time()
     entry.config(state='normal')
     check_button.config(state='normal')
 
@@ -39,18 +67,8 @@ def start_game(difficulty):
         max_attempts = 5
 
     remaining_attempts = max_attempts
-    result_label.config(text="", fg="#ECF0F1")
-    attempts_label.config(text=f"Remaining Attempts: {remaining_attempts}", fg="#ECF0F1")
-    entry.delete(0, tk.END)
-
-# Function to play sound effects
-def play_sound(effect):
-    if effect == "win":
-        winsound.PlaySound("SystemAsterisk", winsound.SND_ALIAS)
-    elif effect == "lose":
-        winsound.PlaySound("SystemHand", winsound.SND_ALIAS)
-    else:
-        winsound.PlaySound("SystemExclamation", winsound.SND_ALIAS)
+    result_label.config(text="")
+    attempts_label.config(text=f"Remaining Attempts: {remaining_attempts}")
 
 # Function to check the guess
 def check_guess():
@@ -58,26 +76,22 @@ def check_guess():
     guess = entry.get()
 
     if not guess.isdigit():
-        messagebox.showwarning("Invalid input", "Please enter a valid number!")
+        result_label.config(text="Invalid input, enter a number!")
         entry.delete(0, tk.END)
         return
 
     guess = int(guess)
     attempts += 1
     remaining_attempts -= 1
-    attempts_label.config(text=f"Remaining Attempts: {remaining_attempts}", fg="#ECF0F1")
+    attempts_label.config(text=f"Remaining Attempts: {remaining_attempts}")
 
     # Check if guess is correct, too high, or too low
     if guess < target_number:
-        result_label.config(text="Too low! Try again.", fg="#F39C12")
-        play_sound("low")
+        result_label.config(text="Too low! Try again.")
     elif guess > target_number:
-        result_label.config(text="Too high! Try again.", fg="#F39C12")
-        play_sound("high")
+        result_label.config(text="Too high! Try again.")
     else:
-        play_sound("win")
-        elapsed_time = round(time.time() - start_time, 2)
-        result_label.config(text=f"Congratulations! You guessed it in {attempts} attempts and {elapsed_time} seconds.", fg="#2ECC71")
+        result_label.config(text=f"Congratulations! You guessed it in {attempts} attempts.")
         entry.config(state='disabled')
         check_button.config(state='disabled')
         wins += 1
@@ -86,10 +100,8 @@ def check_guess():
 
     # Check if attempts are exhausted
     if remaining_attempts == 0:
-        play_sound("lose")
-        result_label.config(text=f"You lost! The number was {target_number}.", fg="#E74C3C")
+        result_label.config(text=f"You lost! The number was {target_number}.")
         losses += 1
-        update_scoreboard()
         entry.config(state='disabled')
         check_button.config(state='disabled')
 
@@ -100,17 +112,7 @@ def reset_game():
 
 # Function to update the scoreboard
 def update_scoreboard():
-    scoreboard_label.config(text=f"Wins: {wins} | Losses: {losses}", fg="#ECF0F1")
-
-# Function to change the theme
-def change_theme():
-    global theme
-    if theme == "dark":
-        window.configure(bg="#FFFFFF")
-        theme = "light"
-    else:
-        window.configure(bg="#2C3E50")
-        theme = "dark"
+    scoreboard_label.config(text=f"Wins: {wins} | Losses: {losses}")
 
 # Add a label for difficulty selection
 difficulty_var = tk.StringVar(value="Medium")
@@ -147,13 +149,18 @@ attempts_label.pack(pady=10)
 scoreboard_label = tk.Label(window, text="Wins: 0 | Losses: 0", font=("Arial", 12), bg="#2C3E50", fg="#ECF0F1")
 scoreboard_label.pack(pady=10)
 
+# Label to display the leaderboard
+leaderboard_label = tk.Label(window, text="Leaderboard:\nNo scores yet.", font=("Arial", 12), bg="#2C3E50", fg="#ECF0F1")
+leaderboard_label.pack(pady=10)
+
 # Add a button to reset the game
 reset_button = tk.Button(window, text="Reset Game", command=reset_game, font=("Arial", 14), bg="#E74C3C", fg="#ECF0F1", bd=0, relief="flat", width=12)
 reset_button.pack(pady=20)
 
-# Add a button to change the theme
-theme_button = tk.Button(window, text="Change Theme", command=change_theme, font=("Arial", 14), bg="#8E44AD", fg="#ECF0F1", bd=0, relief="flat", width=12)
-theme_button.pack(pady=10)
+# Add a button to open settings
+settings_button = tk.Button(window, text="Settings", command=open_settings, font=("Arial", 14), bg="#8E44AD", fg="#ECF0F1", bd=0, relief="flat", width=12)
+settings_button.pack(pady=10)
 
 # Start the main loop
+apply_theme("Default")  # Apply the default theme on startup
 window.mainloop()
