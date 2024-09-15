@@ -1,12 +1,12 @@
 import tkinter as tk
 import random
-import winsound  # Optional: For sound effects (use pygame for cross-platform)
 from tkinter import messagebox
 
 # Create the main window
 window = tk.Tk()
 window.title("Guess the Number")
-window.geometry("400x400")
+window.geometry("500x500")
+window.configure(bg="#2C3E50")  # Dark blue background
 
 # Global variables
 target_number = 0
@@ -34,8 +34,8 @@ def start_game(difficulty):
         max_attempts = 5
     
     remaining_attempts = max_attempts
-    result_label.config(text="")
-    attempts_label.config(text=f"Remaining Attempts: {remaining_attempts}")
+    result_label.config(text="", fg="#ECF0F1")
+    attempts_label.config(text=f"Remaining Attempts: {remaining_attempts}", fg="#ECF0F1")
     entry.delete(0, tk.END)
 
 # Function to check the guess
@@ -51,17 +51,14 @@ def check_guess():
     guess = int(guess)
     attempts += 1
     remaining_attempts -= 1
-    attempts_label.config(text=f"Remaining Attempts: {remaining_attempts}")
+    attempts_label.config(text=f"Remaining Attempts: {remaining_attempts}", fg="#ECF0F1")
 
     if guess < target_number:
-        result_label.config(text="Too low! Try again.", fg="blue")
-        winsound.Beep(400, 200)  # Incorrect guess sound
+        result_label.config(text="Too low! Try again.", fg="#F39C12")
     elif guess > target_number:
-        result_label.config(text="Too high! Try again.", fg="blue")
-        winsound.Beep(400, 200)  # Incorrect guess sound
+        result_label.config(text="Too high! Try again.", fg="#F39C12")
     else:
-        result_label.config(text=f"Congratulations! You guessed it in {attempts} attempts.", fg="green")
-        winsound.Beep(600, 500)  # Correct guess sound
+        result_label.config(text=f"Congratulations! You guessed it in {attempts} attempts.", fg="#2ECC71")
         entry.config(state='disabled')
         check_button.config(state='disabled')
         wins += 1
@@ -69,7 +66,7 @@ def check_guess():
         return
 
     if remaining_attempts == 0:
-        result_label.config(text=f"You lost! The number was {target_number}.", fg="red")
+        result_label.config(text=f"You lost! The number was {target_number}.", fg="#E74C3C")
         losses += 1
         update_scoreboard()
         entry.config(state='disabled')
@@ -82,46 +79,46 @@ def reset_game():
 
 # Function to update the scoreboard
 def update_scoreboard():
-    scoreboard_label.config(text=f"Wins: {wins} | Losses: {losses}")
+    scoreboard_label.config(text=f"Wins: {wins} | Losses: {losses}", fg="#ECF0F1")
 
 # Add a label for difficulty selection
 difficulty_var = tk.StringVar(value="Medium")
-tk.Label(window, text="Select Difficulty:", font=("Arial", 12)).pack(pady=10)
-tk.Radiobutton(window, text="Easy (1-50)", variable=difficulty_var, value="Easy", font=("Arial", 10)).pack()
-tk.Radiobutton(window, text="Medium (1-100)", variable=difficulty_var, value="Medium", font=("Arial", 10)).pack()
-tk.Radiobutton(window, text="Hard (1-200)", variable=difficulty_var, value="Hard", font=("Arial", 10)).pack()
+tk.Label(window, text="Select Difficulty:", font=("Arial", 14), bg="#2C3E50", fg="#ECF0F1").pack(pady=10)
+tk.Radiobutton(window, text="Easy (1-50)", variable=difficulty_var, value="Easy", font=("Arial", 12), bg="#2C3E50", fg="#ECF0F1").pack()
+tk.Radiobutton(window, text="Medium (1-100)", variable=difficulty_var, value="Medium", font=("Arial", 12), bg="#2C3E50", fg="#ECF0F1").pack()
+tk.Radiobutton(window, text="Hard (1-200)", variable=difficulty_var, value="Hard", font=("Arial", 12), bg="#2C3E50", fg="#ECF0F1").pack()
 
 # Add a button to start the game
-start_button = tk.Button(window, text="Start Game", command=reset_game, font=("Arial", 14))
-start_button.pack(pady=10)
+start_button = tk.Button(window, text="Start Game", command=reset_game, font=("Arial", 14), bg="#3498DB", fg="#ECF0F1", bd=0, relief="flat", width=12)
+start_button.pack(pady=20)
 
 # Add a label for instructions
-label = tk.Label(window, text="Guess the number:", font=("Arial", 14))
+label = tk.Label(window, text="Guess the number:", font=("Arial", 14), bg="#2C3E50", fg="#ECF0F1")
 label.pack(pady=10)
 
 # Create an entry widget for user input
-entry = tk.Entry(window, font=("Arial", 14))
-entry.pack(pady=10)
+entry = tk.Entry(window, font=("Arial", 14), bg="#34495E", fg="#ECF0F1", justify="center", relief="flat", bd=2)
+entry.pack(pady=10, ipadx=5, ipady=5)
 
 # Add a button to check the guess
-check_button = tk.Button(window, text="Check Guess", command=check_guess, font=("Arial", 14), state='disabled')
-check_button.pack(pady=10)
+check_button = tk.Button(window, text="Check Guess", command=check_guess, font=("Arial", 14), bg="#3498DB", fg="#ECF0F1", bd=0, relief="flat", width=12, state='disabled')
+check_button.pack(pady=20)
 
 # Label to display the result of the guess
-result_label = tk.Label(window, text="", font=("Arial", 14))
+result_label = tk.Label(window, text="", font=("Arial", 14), bg="#2C3E50", fg="#ECF0F1")
 result_label.pack(pady=10)
 
 # Label to display remaining attempts
-attempts_label = tk.Label(window, text="Remaining Attempts: ", font=("Arial", 12))
+attempts_label = tk.Label(window, text="Remaining Attempts: ", font=("Arial", 12), bg="#2C3E50", fg="#ECF0F1")
 attempts_label.pack(pady=10)
 
 # Label to display the scoreboard
-scoreboard_label = tk.Label(window, text="Wins: 0 | Losses: 0", font=("Arial", 12))
+scoreboard_label = tk.Label(window, text="Wins: 0 | Losses: 0", font=("Arial", 12), bg="#2C3E50", fg="#ECF0F1")
 scoreboard_label.pack(pady=10)
 
 # Add a button to reset the game
-reset_button = tk.Button(window, text="Reset Game", command=reset_game, font=("Arial", 14))
-reset_button.pack(pady=10)
+reset_button = tk.Button(window, text="Reset Game", command=reset_game, font=("Arial", 14), bg="#E74C3C", fg="#ECF0F1", bd=0, relief="flat", width=12)
+reset_button.pack(pady=20)
 
 # Start the main loop
 window.mainloop()
